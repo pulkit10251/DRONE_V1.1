@@ -106,10 +106,10 @@ int BASE_THROTTLE = 1400;
 void setup() {
     
     
-    Top_Left.attach(D2);
-    Top_Right.attach(D3);
-    Bottom_Left.attach(D4);
-    Bottom_Right.attach(D5);
+    Top_Left.attach(D2,1000,2000);
+    Top_Right.attach(D3,1000,2000);
+    Bottom_Left.attach(D4,1000,2000);
+    Bottom_Right.attach(D5,1000,2000);
 
 
     Top_Left.writeMicroseconds(1000);
@@ -210,6 +210,15 @@ void setup() {
 }
 
 
+BLYNK_WRITE(V0){  //for calibration of the motor.
+  int ab=param.asInt();
+  Top_Left.writeMicroseconds(ab);
+  isCallibrated = 1;
+  
+  lcd.clear();
+  lcd.print(0,0, "Callibrated");
+}
+
 
 BLYNK_WRITE(V1){    // Arm Drone
     
@@ -303,19 +312,19 @@ BLYNK_WRITE(V8){  // MOVE UP OR DOWN
 
     Serial.println(y);
   
-    input_TL_THROTTLE += y;
-    input_TR_THROTTLE += y;
-    input_BL_THROTTLE += y;
-    input_BR_THROTTLE += y;
+    input_TL_THROTTLE = y;
+    input_TR_THROTTLE = y;
+    input_BL_THROTTLE = y;
+    input_BR_THROTTLE = y;
 
 
     input_ROLL = 0;
     input_PITCH = 0;
     
-    if(y > BASE_THROTTLE){
+    if(y > 0){
       lcd.clear();
       lcd.print(0,0,"MOVING UP");
-    }else if(y  < BASE_THROTTLE){
+    }else if(y  < 0){
       lcd.clear();
       lcd.print(0,0,"MOVING DOWN");  
     }else{
@@ -330,6 +339,12 @@ BLYNK_WRITE(V10){  // PITCH AND ROLL
   
     int x = param[0].asInt();
     int y = param[1].asInt();
+
+    if(x == 10 || x == -10){
+      input_ROLL = x;
+    }
+
+   
 
 
     
@@ -430,6 +445,8 @@ void loop() {
     *multiplied by the error*/
     roll_pid_p = roll_kp*roll_error;
     pitch_pid_p = pitch_kp*pitch_error;
+
+    
     /*The integral part should only act if we are close to the
     desired position but we want to fine tune the error. That's
     why I've made a if operation for an error between -2 and 2 degree.
@@ -469,6 +486,20 @@ void loop() {
     pwm_B_R  = 115 + input_BR_THROTTLE - roll_PID + pitch_PID;
     pwm_B_L  = 115 + input_BL_THROTTLE + roll_PID + pitch_PID;
     pwm_T_L  = 115 + input_TL_THROTTLE + roll_PID - pitch_PID;
+
+    Serial.print("ROLL PID : ");
+    Serial.print(roll_PID);
+    Serial.println();
+
+    Serial.print("INPUT THROTTLE : ");
+    Serial.print(input_TR_THROTTLE);
+    Serial.println();
+
+
+
+    Serial.print("PITCH PID : ");
+    Serial.print(pitch_PID);
+    Serial.println();
 
 
       if(pwm_T_R < 1100)
@@ -514,11 +545,10 @@ void loop() {
       pitch_previous_error = pitch_error; //Remember to store the previous error.
 
 
-      Serial.print(pwm_T_L);
-      Serial.print(pwm_T_R);
-      Serial.print(pwm_B_L);
-      Serial.print(pwm_B_R);
-      
+      Serial.println(pwm_T_L);
+      Serial.println(pwm_T_R);
+      Serial.println(pwm_B_L);
+      Serial.println(pwm_B_R);
 
       Top_Left.writeMicroseconds(pwm_T_L);
       Top_Right.writeMicroseconds(pwm_T_R);
