@@ -10,8 +10,8 @@
 
 // Bynk Authorization
 char auth[] = "amadp4ybZBdUyrqQk-xq2DYEUBA3ha0P";
-char ssid[] = "Honor 9 Lite";
-char pass[] = "mohan123";
+char ssid[] = "Sarthak";
+char pass[] = "sarthak garg";
 
 
 const uint16_t mpuAddr = 0x68;
@@ -94,12 +94,12 @@ float pitch_desired_angle = 0;
 
 
 int D2 = 2;
-int D3 = 4;
-int D4 = 5;
-int D5 = 18;
+int D4 = 4;
+int D12 = 12;
+int D14 = 14;
 
 
-int BASE_THROTTLE = 1400;
+int BASE_THROTTLE = 1200;
 
 
 
@@ -107,9 +107,9 @@ void setup() {
     
     
     Top_Left.attach(D2,1000,2000);
-    Top_Right.attach(D3,1000,2000);
+    Top_Right.attach(D12,1000,2000);
     Bottom_Left.attach(D4,1000,2000);
-    Bottom_Right.attach(D5,1000,2000);
+    Bottom_Right.attach(D14,1000,2000);
 
 
     Top_Left.writeMicroseconds(1000);
@@ -213,6 +213,11 @@ void setup() {
 BLYNK_WRITE(V0){  //for calibration of the motor.
   int ab=param.asInt();
   Top_Left.writeMicroseconds(ab);
+  Top_Right.writeMicroseconds(ab);
+  
+  Bottom_Right.writeMicroseconds(ab);
+  
+  Bottom_Left.writeMicroseconds(ab);
   isCallibrated = 1;
   
   lcd.clear();
@@ -257,8 +262,8 @@ BLYNK_WRITE(V2){    // Rotate Right;
 
     if(ab == 1){
 
-      input_TL_THROTTLE += 10;
-      input_TR_THROTTLE -= 10;
+      input_TL_THROTTLE -= 10;
+      input_TR_THROTTLE += 10;
       input_BL_THROTTLE += 10;
       input_BR_THROTTLE -= 10;
       lcd.clear();
@@ -266,8 +271,8 @@ BLYNK_WRITE(V2){    // Rotate Right;
       
     }else{
       
-      input_TL_THROTTLE -= 10;
-      input_TR_THROTTLE += 10;
+      input_TL_THROTTLE += 10;
+      input_TR_THROTTLE -= 10;
       input_BL_THROTTLE -= 10;
       input_BR_THROTTLE += 10;
       lcd.clear();
@@ -286,8 +291,8 @@ BLYNK_WRITE(V3){ // Rotate left
 
     if(ab == 1){
 
-        input_TL_THROTTLE -= 10;
-        input_TR_THROTTLE += 10;
+        input_TL_THROTTLE += 10;
+        input_TR_THROTTLE -= 10;
         input_BL_THROTTLE -= 10;
         input_BR_THROTTLE += 10;
     
@@ -295,8 +300,8 @@ BLYNK_WRITE(V3){ // Rotate left
         lcd.print(0,0,"LEFT ROTATING");
       
     }else{
-        input_TL_THROTTLE += 10;
-        input_TR_THROTTLE -= 10;
+        input_TL_THROTTLE -= 10;
+        input_TR_THROTTLE += 10;
         input_BL_THROTTLE += 10;
         input_BR_THROTTLE -= 10;
         
@@ -344,9 +349,7 @@ BLYNK_WRITE(V10){  // PITCH AND ROLL
       input_ROLL = x;
     }
 
-   
-
-
+  
     
     input_ROLL = x;
     input_PITCH = y;    
